@@ -1,0 +1,122 @@
+using System;
+
+namespace Hangman_Csharp
+{
+    internal class Program
+    {
+        static string? Word;
+        static int Length;
+        static string? LengthIn_;
+        static string? PlayerLGuess;
+        static string? PlayerWGuess;
+        static int IncorrectGuesses;
+        static readonly int MaxIncorrectGuesses = 7;
+        static char[] CurrentGuess;
+
+        static void Main()
+        {
+            Console.WriteLine("Hello and welcome to hangman!");
+            ChooseWord();
+            GuessWord();
+        }
+
+        public static void ChooseWord()
+        {
+            Console.Write("Choose a word: ");
+            Word = Console.ReadLine()?.ToLower();
+            Length = Word.Length;
+            LengthIn_ = new string('_', Length);
+            CurrentGuess = LengthIn_.ToCharArray();
+            Console.Clear();
+        }
+
+        public static void GuessWord()
+        {
+            Console.WriteLine("The word is: {0}", new string(CurrentGuess));
+            while (true)
+            {
+                Console.WriteLine("L: Guess a letter \nW: Guess the full word");
+                string? choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "L":
+                    case "l":
+                        GuessLetter();
+                        break;
+                    case "W":
+                    case "w":
+                        GuessFullWord();
+                        break;
+                    default:
+                        Console.WriteLine("Invalid input, try again.");
+                        continue;
+                }
+
+                if (new string(CurrentGuess) == Word)
+                {
+                    Console.WriteLine("Congratulations! You've guessed the word: {0}", Word);
+                    break;
+                }
+
+                if (IncorrectGuesses >= MaxIncorrectGuesses)
+                {
+                    Console.WriteLine("Sorry, you've been hanged! The word was: {0}", Word);
+                    break;
+                }
+
+                Console.WriteLine("Current word: {0}", new string(CurrentGuess));
+                Console.WriteLine("You have {0} guesses left.", MaxIncorrectGuesses - IncorrectGuesses);
+            }
+        }
+
+        public static void GuessLetter()
+        {
+            Console.WriteLine("What letter do you want to guess?");
+            PlayerLGuess = Console.ReadLine();
+
+            if (string.IsNullOrEmpty(PlayerLGuess) || PlayerLGuess.Length > 1)
+            {
+                Console.WriteLine("Please enter a single letter.");
+                return;
+            }
+
+            char guessedLetter = PlayerLGuess[0].ToString().ToLower()[0];
+            bool correctGuess = false;
+
+            for (int i = 0; i < Length; i++)
+            {
+                if (Word[i] == guessedLetter)
+                {
+                    CurrentGuess[i] = guessedLetter;
+                    correctGuess = true;
+                }
+            }
+
+            if (!correctGuess)
+            {
+                IncorrectGuesses++;
+                Console.WriteLine("Wrong! You have {0} guesses left.", MaxIncorrectGuesses - IncorrectGuesses);
+            }
+        }
+
+        public static void GuessFullWord()
+        {
+            Console.WriteLine("What word do you want to guess?");
+            PlayerWGuess = Console.ReadLine()?.ToLower();
+
+            if (string.Equals(PlayerWGuess, Word, StringComparison.OrdinalIgnoreCase))
+            {
+                Console.Clear();
+                Console.WriteLine("Congratulations! You've guessed the word: {0}", Word);
+                Environment.Exit(0);
+            }
+            else
+            {
+                Console.Clear();
+                IncorrectGuesses++;
+                Console.WriteLine("Incorrect guess! You have {0} guesses left.", MaxIncorrectGuesses - IncorrectGuesses);
+            }
+        }
+    }
+}
